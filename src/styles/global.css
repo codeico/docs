@@ -1,0 +1,29 @@
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+  
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 1rem;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .project-card:hover {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .project-info {
+    margin-top: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--theme-text, #333);
+  }
+  

@@ -1,0 +1,177 @@
+---
+title: 🛡️ Validator Node
+description: Step-by-step guide to install and manage a 0G Labs Validator Node.
+---
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+This guide will install the latest version and cannot sync from block 0. Therefore, you must use a snapshot. This guide will help you set up a Validator Node for **0G Labs**. For official documentation, please refer to the [Official 0G Labs docs](https://docs.0g.ai/run-a-node/validator-node).
+
+---
+
+## ⚙️ Requirements
+
+- **CPU**: 8 Cores  
+- **Memory**: 64GB RAM  
+- **Disk**: 1 TB of storage (NVME)  
+- **Bandwidth**: 100 Mbps (Download / Upload)  
+
+---
+
+## 🚀 Install
+
+### 1. Install Dependencies
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install curl git wget htop tmux build-essential jq make lz4 gcc unzip -y
+```
+
+---
+
+**Auto-install Script Powered by ITRocket 🚀**
+  
+Special thanks to **ITRocket** for this Auto Install Script.
+
+```bash
+source <(curl -s https://itrocket.net/api/testnet/og/autoinstall/)
+```
+
+---
+### 2. Create Wallet
+
+<Tabs>
+  <TabItem label="Create Wallet">
+    <p>To create a new wallet, use the following command. Don’t forget to save the mnemonic</p>
+    ```bash
+    0gchaind keys add $WALLET
+    ```
+  </TabItem>
+  <TabItem label="Save Wallet Address">
+    <p>To restore existing wallet, use the following command</p>
+    ```bash
+    0gchaind keys add $WALLET --recover
+    ```
+  </TabItem>
+  <TabItem label="Restore Wallet">
+    <p>If you want to restore an existing wallet, use the following command:</p>
+    ```bash
+    0gchaind keys add $WALLET --eth --recover
+    ```
+  </TabItem>
+</Tabs>
+
+
+**Save Wallet & Validator Address**
+
+```bash
+WALLET_ADDRESS=$(0gchaind keys show $WALLET -a)
+VALOPER_ADDRESS=$(0gchaind keys show $WALLET --bech val -a)
+
+echo "export WALLET_ADDRESS=$WALLET_ADDRESS" >> $HOME/.bash_profile
+echo "export VALOPER_ADDRESS=$VALOPER_ADDRESS" >> $HOME/.bash_profile
+source $HOME/.bash_profile
+```
+
+---
+
+### 3. 📊 Check Block Sync
+
+Script by **ITRocket**:
+
+```bash
+#!/bin/bash
+rpc_port=$(grep -m 1 -oP '^laddr = "\K[^"]+' "$HOME/.0gchain/config/config.toml" | cut -d ':' -f 3)
+
+while true; do
+  local_height=$(curl -s localhost:$rpc_port/status | jq -r '.result.sync_info.latest_block_height')
+  network_height=$(curl -s https://og-testnet-rpc.itrocket.net/status | jq -r '.result.sync_info.latest_block_height')
+
+  if ! [[ "$local_height" =~ ^[0-9]+$ ]] || ! [[ "$network_height" =~ ^[0-9]+$ ]]; then
+    echo -e "\033[1;31mError: Invalid block height data. Retrying...\033[0m"
+    sleep 5
+    continue
+  fi
+
+  blocks_left=$((network_height - local_height))
+  echo -e "\033[1;33mNode Height:\033[1;34m $local_height\033[0m \033[1;33m| Network Height:\033[1;36m $network_height\033[0m \033[1;33m| Blocks Left:\033[1;31m $blocks_left\033[0m"
+  sleep 5
+done
+``` 
+
+---
+
+### 4. 🔍 Check Node Status
+
+Make sure you see `"catching_up": false`:
+
+```bash
+0gchaind status 2>&1 | jq
+```
+
+---
+
+## 🧱 Create Validator
+
+### 1. Check Balance
+
+Change `"wallet_name"`:
+
+```bash
+0gchaind q bank balances $(0gchaind keys show "wallet_name" -a)
+```
+
+---
+
+### 2. Create Validator
+
+> 💡 `1000000ua0gi = 1 A0GI`
+
+```bash
+0gchaind tx staking create-validator \
+--amount 1000000ua0gi \
+--from $WALLET \
+--commission-rate 0.1 \
+--commission-max-rate 0.2 \
+--commission-max-change-rate 0.01 \
+--min-self-delegation 1 \
+--pubkey $(0gchaind tendermint show-validator) \
+--moniker "test" \
+--identity "" \
+--website "" \
+--details "I love blockchain ❤️" \
+--chain-id zgtendermint_16600-2 \
+--gas-adjustment 1.5 --gas auto --gas-prices 0.00252ua0gi \
+-y
+```
+
+---
+
+### 3. Check Validator Info
+
+Change `"wallet_name"`:
+
+```bash
+0gchaind q staking validator $(0gchaind keys show "wallet_name" --bech val -a)
+```
+
+---
+
+## 🗑️ Delete Node (With Caution!)
+
+⚠️ <strong>Critical:</strong> Backup Your Validator Key!  
+Do not lose this key — it is required to run your validator.  
+File location: <span style={{ color: 'red' }}>`/root/.0gchain/config/priv_validator_key.json`</span>
+
+```bash
+sudo systemctl stop 0gchaind
+sudo systemctl disable 0gchaind
+sudo rm -rf /etc/systemd/system/0gchaind.service
+sudo rm $(which 0gchaind)
+sudo rm -rf $HOME/.0gchain
+sed -i "/OG_/d" $HOME/.bash_profile
+```
+
+---
+
+Maintained by **BANGCODE**  
+Supported by [Maouam's Node Lab](https://maouam.nodelab.my.id/)

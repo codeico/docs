@@ -1,0 +1,88 @@
+---
+title: "Overview"
+description: Community-driven guide for setting up nodes in the 0G Labs ecosystem
+---
+
+# 🧪 0G Labs – Community Guide
+Welcome to the community-driven guide for setting up and managing various components within the 0G Labs ecosystem. This guide is designed to provide clear and concise instructions to help users deploy and maintain 0G Labs nodes and services with ease.
+
+> ⚠️ **Note**: This is an unofficial guide. For the most accurate and up-to-date information, please refer to the official 0G Labs documentation.
+
+---
+
+## 🛡️ Validator
+
+Validators are essential to the 0G network, playing a key role in securing the system and participating in consensus. They propose and validate new blocks, helping maintain network integrity while earning rewards for their contribution.
+
+This guide covers:
+
+- **Validator Installation**: Quick and easy setup with just a few commands — get your validator up and running in minutes, complete with all dependencies.
+- **Wallet & Key Setup**: Instructions for creating or importing wallets and generating validator keys.
+- **Validator Registration**: Steps to register as an active validator on the 0G Labs network.
+- **Monitoring & Maintenance**: Helpful commands for monitoring validator status and ensuring optimal performance.
+
+👉 [Go to Validator Section](./validator)
+
+---
+
+## 📦 Storage Node
+
+Storage Nodes are vital to maintaining the decentralized storage layer in the 0G network. They store and serve data, ensuring availability and reliability across the network. By running a Storage Node, you contribute to the network while earning rewards.
+
+This guide includes:
+
+- **One-Click Installation**: Simple command-based install for both standard and turbo configurations.
+- **Manual Setup**: Detailed instructions for setting up manually.
+- **Snapshot Integration**: Guide on integrating snapshots to accelerate syncing.
+- **Useful Commands**: Key commands for monitoring and managing your node.
+
+👉 [Go to Storage Node Guide](./storage-node/install)
+
+---
+
+## 🧵 Snapshot Service
+
+Snapshots offer pre-synced data to help new Storage Nodes sync quickly without starting from block 0. They’re especially helpful after testnet resets or fresh installations.
+
+Features include:
+
+- **Snapshot Status**: View current snapshot availability and block height.
+- **Installation**: One-click install or manual restore options available.
+
+👉 [Go to Snapshot Guide](./storage-node/snapshot)
+
+---
+
+## 🧠 Data Availability (DA) Node
+
+DA Nodes are responsible for verifying, signing, and storing encoded blob data. They ensure data submitted on-chain is available and provable.
+
+This guide provides:
+
+- **Requirements**: Hardware and staking prerequisites.
+- **Installation Steps**: Full instructions to install packages, set up the environment, and build the project.
+- **Configuration**: Guidance on editing config files and setting up services.
+- **Node Management**: Commands for starting, stopping, and removing the node.
+
+🛠️ (Coming Soon)
+
+---
+
+## 🛰️ DA Client
+
+The 0G DA Client is a tool to interact with DA Nodes by submitting, encoding, and storing data blobs. It also supports data retrieval and availability verification via a built-in Retriever API. Typically, it runs in a containerized environment and integrates with validator stacks or other tools.
+
+- **Installation**: Uses Docker to run a custom-built image from source.
+- **Environment Configuration**: Requires setting up private keys and DA encoder addresses.
+
+🛠️ (Coming Soon)
+
+---
+
+## 🤝 Contributions & Feedback
+
+This guide is maintained by the community to assist users in navigating the 0G Labs ecosystem. Contributions, suggestions, and feedback are welcome to improve the accuracy and clarity of this resource.
+
+📅 **Last updated**: April 20, 2025  
+🛠️ **Maintained by**: BANGCODE  
+🤝 **Supported by**: [Maouam's Node Lab Team](https://maouam.nodelab.my.id/)
