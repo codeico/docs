@@ -1,0 +1,107 @@
+---
+title: Backup
+description: Backup - Validator Node | BANGCODE
+---
+
+## Part 1: Backing Up the Node
+
+### Stop the Node
+
+```bash
+sudo systemctl stop 0gd.service
+```
+
+### Backup the Wallet Private Key (Ethereum)
+
+Export your Ethereum wallet private key:
+
+```bash
+0gchaind keys unsafe-export-eth-key "wallet"
+```
+
+### Backup the Validator Key
+
+The validator key is located here:
+
+```
+/root/.0gchain/config/priv_validator_key.json
+```
+
+Copy this file to your local machine. This is your most important key as a validator. Losing it means losing control of your validator.
+
+If you’ve never made a backup before, it's recommended to back up the entire config folder:
+
+```bash
+cp -r /root/.0gchain/config /path/to/backup/location
+```
+
+---
+
+## Part 2: Restoring the Node and Wallet
+
+### Install a Fresh Node and Sync the Blockchain
+
+Follow the instructions to install a new node and wait until the blockchain is fully synced.
+
+> 💡 _Tip: Refer to the official 0G documentation or installation guide to set up the new node._
+
+### Stop the New Node Before Restoration
+
+```bash
+sudo systemctl stop 0gd
+```
+
+> ⚠️ **Important Warning**
+>
+> Make sure the old VPS node is stopped. **Never run two nodes** using the same `priv_validator_key.json`, as this will cause **double signing** and could result in slashing.
+
+### Restore Validator Key
+
+Copy and replace the previously backed up `priv_validator_key.json` into:
+
+```
+/root/.0gchain/config/
+```
+
+### Restore Wallet
+
+#### From Private Key:
+
+```bash
+0gchaind keys unsafe-import-eth-key "wallet_name" "privatekey"
+```
+
+#### From Mnemonic Phrase:
+
+```bash
+0gchaind keys add "wallet" --eth --recover
+```
+
+### Restart the Node
+
+```bash
+sudo systemctl start 0gd
+```
+
+### Validate the Node and Validator Status
+
+Make sure everything is operating correctly by checking your node and validator status:
+
+```bash
+0gchaind status
+```
+
+Or check validator info:
+
+```bash
+0gchaind q staking validator $(0gchaind keys show wallet --bech val -a)
+```
+
+---
+
+> ⚠️ **Caution**
+>
+> - Always back up critical data before any major actions.
+> - Store your keys and backups in a secure, preferably offline, location (e.g. hardware wallet, encrypted USB, or offline password manager).
+> - Never share your private key or mnemonic phrase with anyone. Beware of phishing sites or impersonators.
+> - Double-check every operation involving your validator to avoid risks like slashing. Ensure the chain ID, gas fees, and validator address are correct.
