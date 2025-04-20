@@ -24,7 +24,7 @@ The latest snapshot is available for download. Using it can significantly reduce
 
 <Tabs>
   <TabItem label="Standar Config">
-    <p>Snapshot full DB : [4049002 Blocks]</p>
+    <p>LogSyncHeight <span class="sl-badge success small astro-avdet4wd">4049002</span>| Size: <span class="sl-badge tip small astro-avdet4wd">45G</span></p>
     ```bash
     bash <(wget -qO- https://cdn.bangcode.id/0g/bangcode_0g_storage_tools.sh)
     ```
@@ -50,30 +50,15 @@ cd && sudo apt-get install wget lz4 aria2 pv -y
 
 ### 2. Download Snapshot
 
-> Snapshot (Standard/Turbo):  
-> Contract: turbo  
-> Blocks: -  
-> Size: -
-
-**Note:** Turbo snapshot is currently under maintenance.
-
 <Tabs>
   <TabItem label="Standar Config">
-    <p>Snapshot full DB : [4049002 Blocks]</p>
-        > Snapshot (Standard/Turbo):  
-        > Contract: stansard  
-        > Blocks: 4049002 Blocks  
-        > Size: 45GB
+    <p>LogSyncHeight <span class="sl-badge success small astro-avdet4wd">4049002</span>| Size: <span class="sl-badge tip small astro-avdet4wd">45G</span></p>
     ```bash
     wget https://cdn.bangcode.id/snapshots/og_storage_2025-04-19_snap.tar.lz4
     ```
   </TabItem>
   <TabItem label="Turbo Config">
-        > Snapshot (Standard/Turbo):  
-        > Contract: turbo  
-        > Blocks: -  
-        > Size: -
-
+    <p>LogSyncHeight <span class="sl-badge success small astro-avdet4wd">000000</span>| Size: <span class="sl-badge tip small astro-avdet4wd">0G</span></p>
         **Note:** Turbo snapshot is currently under maintenance.
   </TabItem>
 </Tabs>
@@ -90,7 +75,21 @@ sudo systemctl stop zgs.service
 
 ### 4. Extract Snapshot
 
-> Turbo config snapshot is currently under maintenance.
+<Tabs>
+  <TabItem label="Standar Config">
+    <p>Snapshot Standar Extract :</p>
+    ```bash
+        rm -rf $HOME/0g-storage-node/run/db
+        lz4 -c -d og_storage_2025-04-19_snap.tar.lz4 | pv | tar -x -C $HOME/0g-storage-node/run
+    ```
+  </TabItem>
+  <TabItem label="Turbo Config">
+        ```bash
+            **Note:** Turbo snapshot is currently under maintenance.
+        ```
+  </TabItem>
+</Tabs>
+
 
 ---
 
@@ -107,7 +106,7 @@ sudo systemctl restart zgs && sudo systemctl status zgs
 After successful installation, you can delete the downloaded snapshot to save disk space.
 
 ```bash
-rm -rf snapshot_standard_astrostake_2025-03-15.tar.lz4
+rm -rf og_storage_2025-04-19_snap.tar.lz4
 ```
 
 ---
@@ -124,4 +123,3 @@ sudo systemctl start zgs
 
 ---
 
-Need help? Reach out on Discord or Telegram for community support!
