@@ -1,0 +1,222 @@
+---
+title: Storage Node
+description: Step-by-step guide to install and manage a 0G Labs Storage Node. | BANGCODE
+---
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+This guide will help you set up a Storage Node for OG Labs. For official documentation, check [here](https://docs.0g.ai).
+
+---
+
+## Requirements
+
+- **Memory**: 16 GB RAM  
+- **CPU**: 4 Cores  
+- **Disk**: 500GB / 1TB NVME SSD  
+- **Bandwidth**: 100 Mbps (Download / Upload)  
+
+---
+
+## 🚀 One Click Command Install
+
+###  / Turbo Config
+
+<Tabs syncKey="BANGCODE">
+  <TabItem label="Standard Config">
+    <p>One Click Install Standard Config :</p>
+        ```
+        bash <(wget -qO- https://cdn.bangcode.id/0g/easy_install_zgs_standard.sh)
+        ```
+  </TabItem>
+  <TabItem label="Turbo Config">
+    <p>One Click Install Turbo Config :</p>
+        ```
+        bash <(wget -qO- https://cdn.bangcode.id/0g/easy_install_zgs_standard.sh)
+        ```
+  </TabItem>
+</Tabs>
+
+---
+
+## 🔄 One Click Command Update
+
+**Version**: `v0.8.7`
+
+```
+bash <(wget -qO- https://cdn.bangcode.id/0g/storage_node_update.sh)
+```
+
+---
+
+## 🛠 Manual Install
+
+### Install Necessary Packages
+
+```
+sudo apt update && sudo apt upgrade -y
+sudo apt install curl git wget htop tmux build-essential jq make gcc tar clang pkg-config libssl-dev ncdu cmake -y
+```
+
+### Install Golang
+
+```
+cd $HOME && \
+ver="1.22.0" && \
+wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz" && \
+sudo rm -rf /usr/local/go && \
+sudo tar -C /usr/local -xzf "go$ver.linux-amd64.tar.gz" && \
+rm "go$ver.linux-amd64.tar.gz" && \
+echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile && \
+source ~/.bash_profile && \
+go version
+```
+
+### Install Rust
+
+```
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+sh
+. "$HOME/.cargo/env"
+```
+
+### Download and Install 0G Storage Node [GITHUB]
+
+```
+git clone -b v0.8.6 https://github.com/0glabs/0g-storage-node.git
+cd $HOME/0g-storage-node
+git stash
+git fetch --all --tags
+git checkout v0.8.7
+git submodule update --init
+cargo build --release
+```
+
+---
+
+## ⚙️ Set Configuration
+
+### Standard Config / Turbo Config
+
+<Tabs syncKey="BANGCODE">
+  <TabItem label="Standard Config">
+        ```
+        rm -rf $HOME/0g-storage-node/run/config.toml
+        curl -o $HOME/0g-storage-node/run/config.toml https://cdn.bangcode.id/0g/standar_config.toml
+        ```
+  </TabItem>
+  <TabItem label="Turbo Config">
+        ```
+        rm -rf $HOME/0g-storage-node/run/config-testnet-turbo.toml
+        curl -o $HOME/0g-storage-node/run/config-testnet-turbo.toml https://cdn.bangcode.id/0g/turbo_config.toml
+
+        ```
+  </TabItem>
+</Tabs>
+
+Edit config and input your private key in `miner_key`:
+
+<Tabs syncKey="BANGCODE">
+  <TabItem label="Standard Config">
+        ```
+        nano $HOME/0g-storage-node/run/config.toml
+        ```
+  </TabItem>
+  <TabItem label="Turbo Config">
+        ```
+        nano $HOME/0g-storage-node/run/config-testnet-turbo.toml
+
+        ```
+  </TabItem>
+</Tabs>
+
+
+---
+
+## 🧱 Create Systemd Service
+
+<Tabs syncKey="BANGCODE">
+  <TabItem label="Standard Config">
+    ```
+    sudo tee /etc/systemd/system/zgs.service > /dev/null <<EOF
+    [Unit]
+    Description=ZGS Node
+    After=network.target
+
+    [Service]
+    User=$USER
+    WorkingDirectory=$HOME/0g-storage-node/run
+    ExecStart=$HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
+    Restart=on-failure
+    RestartSec=10
+    LimitNOFILE=65535
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+    ```
+  </TabItem>
+  <TabItem label="Turbo Config">
+        ```
+        sudo tee /etc/systemd/system/zgs.service > /dev/null <<EOF
+        [Unit]
+        Description=ZGS Node
+        After=network.target
+
+        [Service]
+        User=$USER
+        WorkingDirectory=$HOME/0g-storage-node/run
+        ExecStart=$HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config-testnet-turbo.toml
+        Restart=on-failure
+        RestartSec=10
+        LimitNOFILE=65535
+
+        [Install]
+        WantedBy=multi-user.target
+        EOF
+        ```
+  </TabItem>
+</Tabs>
+
+### Start Service
+
+```
+sudo systemctl daemon-reload && sudo systemctl enable zgs && sudo systemctl start zgs
+```
+
+---
+
+## 📦 Optional: [Install Snapshot](#snapshot)
+
+---
+
+## 🧪 Useful Commands
+
+### Check Full Logs
+
+```
+tail -f ~/0g-storage-node/run/log/zgs.log.$(TZ=UTC date +%Y-%m-%d)
+```
+
+### Check Blocks and Peers
+
+```
+source <(curl -s https://cdn.bangcode.id/0g/block_checker.sh)
+```
+
+---
+
+## 🧹 Stop and Delete Node
+
+### Stop
+
+```
+sudo systemctl stop zgs
+```
+
+### Delete
+
+```
+sudo systemctl disable zgs
+sudo rm /etc/systemd/system/zgs.service
+rm -rf $HOME/0g-storage-node
+```
