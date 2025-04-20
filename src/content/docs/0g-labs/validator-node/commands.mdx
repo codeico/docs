@@ -1,0 +1,264 @@
+---
+title: "Commands"
+description: Commands - Validator Node | BANGCODE
+---
+![0G Labs testnet](/img/0g_banner.png)
+
+## 🔑 Key Management
+
+### Add New Wallet:
+```bash
+0gchaind keys add "wallet" --eth
+```
+
+### Recover Wallet:
+```bash
+0gchaind keys add "wallet" --recover --eth
+```
+
+### Get EVM Wallet Address:
+```bash
+echo "0x$(0gchaind debug addr $(0gchaind keys show "wallet" -a) | grep hex | awk '{print $3}')"
+```
+
+### List All Keys:
+```bash
+0gchaind keys list
+```
+
+### Delete Wallet:
+```bash
+0gchaind keys delete "wallet"
+```
+
+### Export Wallet to File:
+```bash
+0gchaind keys export "wallet"
+```
+
+### Import Wallet:
+```bash
+0gchaind keys import "wallet" wallet.backup
+```
+
+### Export Private Key:
+```bash
+0gchaind keys unsafe-export-eth-key "wallet"
+```
+
+### Import Wallet from Private Key:
+```bash
+0gchaind keys unsafe-import-eth-key "wallet_name" "privatekey"
+```
+
+### Query Wallet Balance:
+```bash
+0gchaind q bank balances $(0gchaind keys show "wallet" -a)
+```
+
+---
+
+## 👷 Validator Management
+
+### Create Validator:
+```bash
+0gchaind tx staking create-validator \
+--amount 100000ua0gi \
+--pubkey $(0gchaind tendermint show-validator) \
+--moniker "YOUR_MONIKER_NAME" \
+--identity "YOUR_KEYBASE_ID" \
+--details "YOUR_DETAILS" \
+--website "YOUR_WEBSITE_URL" \
+--chain-id zgtendermint_16600-2 \
+--commission-rate 0.05 \
+--commission-max-rate 0.20 \
+--commission-max-change-rate 0.05 \
+--min-self-delegation 1 \
+--from wallet \
+--gas-adjustment 1.5 \
+--gas auto \
+--gas-prices 0.00252ua0gi \
+-y
+```
+
+### Edit Validator:
+```bash
+0gchaind tx staking edit-validator \
+--new-moniker "YOUR_MONIKER_NAME" \
+--identity "YOUR_KEYBASE_ID" \
+--details "YOUR_DETAILS" \
+--website "YOUR_WEBSITE_URL" \
+--security-contact "YOUR_CONTACT" \
+--chain-id zgtendermint_16600-2 \
+--commission-rate 0.05 \
+--from wallet \
+--gas-adjustment 1.5 \
+--gas auto \
+--gas-prices 0.00252ua0gi \
+-y
+```
+
+### View Validator Details:
+```bash
+0gchaind q staking validator $(0gchaind keys show wallet --bech val -a)
+```
+
+### Check Validator Key:
+```bash
+CONSENSUS_PUBKEY=$(0gchaind q staking validator 0gvaloper1arf2rfrsx4pu9kpzxj06ydces6ptn8jwvth73n -oj | jq -r .consensus_pubkey.key) && \
+VALIDATOR_PUBKEY=$(0gchaind status 2>&1 | jq -r .validator_info.pub_key.value) && \
+echo "Validator Public Key: $VALIDATOR_PUBKEY" && \
+echo "Consensus Public Key: $CONSENSUS_PUBKEY" && \
+if [ "$VALIDATOR_PUBKEY" = "$CONSENSUS_PUBKEY" ]; then \
+    echo -e "\nResult: Keys match. Your key status is \e[32mOK\e[0m."; \
+else \
+    echo -e "\nResult: Keys do not match. Your key status is \e[31mERROR\e[0m."; \
+fi
+```
+
+### Unjail:
+```bash
+0gchaind tx slashing unjail --from wallet --chain-id zgtendermint_16600-2 --gas-adjustment 1.5 --gas auto --gas-prices 0.00252ua0gi -y
+```
+
+---
+
+## 💰 Token Management
+
+### Send Token to Another Wallet:
+```bash
+0gchaind tx bank send "wallet" <TO_WALLET_ADDRESS> 100000ua0gi --from wallet --chain-id zgtendermint_16600-2 --gas-adjustment 1.5 --gas auto --gas-prices 0.00252ua0gi -y
+```
+
+### Delegate Tokens to Yourself:
+```bash
+0gchaind tx staking delegate $(0gchaind keys show wallet --bech val -a) 100000ua0gi --from wallet --chain-id zgtendermint_16600-2 --gas-adjustment 1.5 --gas auto --gas-prices 0.00252ua0gi -y
+```
+
+### Redelegate Tokens to Another Validator:
+```bash
+0gchaind tx staking redelegate $(0gchaind keys show wallet --bech val -a) <TO_VALOPER_ADDRESS> 100000ua0gi --from wallet --chain-id zgtendermint_16600-2 --gas-adjustment 1.5 --gas auto --gas-prices 0.00252ua0gi -y
+```
+
+### Withdraw Rewards from All Validators:
+```bash
+0gchaind tx distribution withdraw-all-rewards --from wallet --chain-id zgtendermint_16600-2 --gas-adjustment 1.5 --gas auto --gas-prices 0.00252ua0gi -y
+```
+
+### Withdraw Commission & Rewards from Your Validator:
+```bash
+0gchaind tx distribution withdraw-rewards $(0gchaind keys show wallet --bech val -a) --commission --from wallet --chain-id zgtendermint_16600-2 --gas-adjustment 1.5 --gas auto --gas-prices 0.00252ua0gi -y
+```
+
+### Unbond Tokens from Your Validator:
+```bash
+0gchaind tx staking unbond $(0gchaind keys show wallet --bech val -a) 100000ua0gi --from wallet --chain-id zgtendermint_16600-2 --gas-adjustment 1.5 --gas auto --gas-prices 0.00252ua0gi -y
+```
+
+---
+
+## 🗳 Governance
+
+### Query Proposals:
+```bash
+0gchaind query gov proposals
+```
+
+### Vote Yes/No:
+```bash
+0gchaind tx gov vote 1 yes/no --from wallet --chain-id zgtendermint_16600-2 --gas-adjustment 1.5 --gas auto --gas-prices 0.00252ua0gi -y
+```
+
+---
+
+## 🚨 Maintenance
+
+### Get Sync Status:
+```bash
+0gchaind status 2>&1 | jq
+```
+
+### Block Sync Left:
+```bash
+while true; do
+  local_height=$(0gchaind status | jq -r .sync_info.latest_block_height);
+  network_height=$(curl -s https://rpc-0gchain.josephtran.xyz/status | jq -r '.result.sync_info.latest_block_height')
+  blocks_left=$((network_height - local_height));
+
+  echo -e "\033[1;38mYour node height:\033[0m \033[1;34m$local_height\033[0m | \033[1;35mNetwork height:\033[0m \033[1;36m$network_height\033[0m | \033[1;29mBlocks left:\033[0m \033[1;31m$blocks_left\033[0m";
+  sleep 5;
+done
+```
+
+### Get Node Peers:
+```bash
+echo $(0gchaind tendermint show-node-id)'@'$(curl -s ipv4.icanhazip.com)':'$(cat $HOME/.0gchain/config/config.toml | sed -n '/Address to listen for incoming connection/{n;p;}' | sed 's/.*://; s/".*//')
+```
+
+### Fetch RPC Port:
+```bash
+RPC="http://$(wget -qO- eth0.me)$(grep -A 3 "\[rpc\]" $HOME/.0gchain/config/config.toml | egrep -o ":[0-9]+")" && echo $RPC
+curl $RPC/status | jq
+```
+
+### Retrieve Node ID and Server IP Address:
+```bash
+echo $(0gchaind tendermint show-node-id)'@'$(curl -s ipv4.icanhazip.com)':'$(cat $HOME/.0gchain/config/config.toml | sed -n '/Address to listen for incoming connection/{n;p;}' | sed 's/.*://; s/".*//')
+```
+
+### From Another Node's RPC:
+```bash
+curl -s https://rpc-0gchain.josephtran.xyz/net_info | jq -r '.result.peers[] | select(.node_info.listen_addr | test("^tcp://0.0.0.0") | not) | "\(.node_info.id)@\(.node_info.listen_addr)"'
+```
+
+### Remove Node:
+**Please back up your `priv_validator_key.json` before proceeding!**
+```bash
+cd $HOME
+sudo systemctl stop 0gd
+sudo systemctl disable 0gd
+sudo rm /etc/systemd/system/0gd.service
+sudo systemctl daemon-reload
+sudo rm -f $(which 0gchaind)
+sudo rm -rf $HOME/.0gchain
+sudo rm -rf $HOME/0g-chain
+```
+
+---
+
+## ⚙️ Service Management
+
+### Reload Service:
+```bash
+sudo systemctl daemon-reload
+```
+
+### Enable Service:
+```bash
+sudo systemctl enable 0gd
+```
+
+### Disable Service:
+```bash
+sudo systemctl disable 0gd
+```
+
+### Start Service:
+```bash
+sudo systemctl start 0gd
+```
+
+### Stop Service:
+```bash
+sudo systemctl stop 0gd
+```
+
+### Restart Service:
+```bash
+sudo systemctl restart 0gd
+```
+
+### Check Service Logs:
+```bash
+sudo journalctl -u 0gd -f --no-hostname -o cat
+```
