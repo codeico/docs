@@ -22,13 +22,13 @@ This guide will help you set up a Storage Node for OG Labs. For official documen
 <Tabs syncKey="BANGCODE">
   <TabItem label="Standard Config">
     <p>One Click Install Standard Config :</p>
-        ```
+        ```bash
         bash <(wget -qO- https://cdn.bangcode.id/0g/easy_install_zgs_standard.sh)
         ```
   </TabItem>
   <TabItem label="Turbo Config">
     <p>One Click Install Turbo Config :</p>
-        ```
+        ```bash
         bash <(wget -qO- https://cdn.bangcode.id/0g/easy_install_zgs_standard.sh)
         ```
   </TabItem>
@@ -40,7 +40,7 @@ This guide will help you set up a Storage Node for OG Labs. For official documen
 
 **Version**: `v0.8.7`
 
-```
+```bash
 bash <(wget -qO- https://cdn.bangcode.id/0g/storage_node_update.sh)
 ```
 
@@ -50,14 +50,14 @@ bash <(wget -qO- https://cdn.bangcode.id/0g/storage_node_update.sh)
 
 ### Install Necessary Packages
 
-```
+```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install curl git wget htop tmux build-essential jq make gcc tar clang pkg-config libssl-dev ncdu cmake -y
 ```
 
 ### Install Golang
 
-```
+```bash
 cd $HOME && \
 ver="1.22.0" && \
 wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz" && \
@@ -71,7 +71,7 @@ go version
 
 ### Install Rust
 
-```
+```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 sh
 . "$HOME/.cargo/env"
@@ -79,7 +79,7 @@ sh
 
 ### Download and Install 0G Storage Node [GITHUB]
 
-```
+```bash
 git clone -b v0.8.6 https://github.com/0glabs/0g-storage-node.git
 cd $HOME/0g-storage-node
 git stash
@@ -97,13 +97,13 @@ cargo build --release
 
 <Tabs syncKey="BANGCODE">
   <TabItem label="Standard Config">
-        ```
+        ```bash
         rm -rf $HOME/0g-storage-node/run/config.toml
         curl -o $HOME/0g-storage-node/run/config.toml https://cdn.bangcode.id/0g/standar_config.toml
         ```
   </TabItem>
   <TabItem label="Turbo Config">
-        ```
+        ```bash
         rm -rf $HOME/0g-storage-node/run/config-testnet-turbo.toml
         curl -o $HOME/0g-storage-node/run/config-testnet-turbo.toml https://cdn.bangcode.id/0g/turbo_config.toml
 
@@ -115,12 +115,12 @@ Edit config and input your private key in `miner_key`:
 
 <Tabs syncKey="BANGCODE">
   <TabItem label="Standard Config">
-        ```
+        ```bash
         nano $HOME/0g-storage-node/run/config.toml
         ```
   </TabItem>
   <TabItem label="Turbo Config">
-        ```
+        ```bash
         nano $HOME/0g-storage-node/run/config-testnet-turbo.toml
 
         ```
@@ -134,7 +134,7 @@ Edit config and input your private key in `miner_key`:
 
 <Tabs syncKey="BANGCODE">
   <TabItem label="Standard Config">
-    ```
+    ```bash
     sudo tee /etc/systemd/system/zgs.service > /dev/null <<EOF
     [Unit]
     Description=ZGS Node
@@ -154,7 +154,7 @@ Edit config and input your private key in `miner_key`:
     ```
   </TabItem>
   <TabItem label="Turbo Config">
-        ```
+        ```bash
         sudo tee /etc/systemd/system/zgs.service > /dev/null <<EOF
         [Unit]
         Description=ZGS Node
@@ -177,7 +177,7 @@ Edit config and input your private key in `miner_key`:
 
 ### Start Service
 
-```
+```bash
 sudo systemctl daemon-reload && sudo systemctl enable zgs && sudo systemctl start zgs
 ```
 
@@ -191,13 +191,13 @@ sudo systemctl daemon-reload && sudo systemctl enable zgs && sudo systemctl star
 
 ### Check Full Logs
 
-```
+```bash
 tail -f ~/0g-storage-node/run/log/zgs.log.$(TZ=UTC date +%Y-%m-%d)
 ```
 
 ### Check Blocks and Peers
 
-```
+```bash
 source <(curl -s https://cdn.bangcode.id/0g/block_checker.sh)
 ```
 
@@ -207,13 +207,13 @@ source <(curl -s https://cdn.bangcode.id/0g/block_checker.sh)
 
 ### Stop
 
-```
+```bash
 sudo systemctl stop zgs
 ```
 
 ### Delete
 
-```
+```bash
 sudo systemctl disable zgs
 sudo rm /etc/systemd/system/zgs.service
 rm -rf $HOME/0g-storage-node

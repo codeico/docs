@@ -79,13 +79,13 @@ sudo systemctl stop zgs.service
   <TabItem label="Standar Config">
     <p>Snapshot Standar Extract :</p>
     ```bash
-        rm -rf $HOME/0g-storage-node/run/db
-        lz4 -c -d og_storage_2025-04-19_snap.tar.lz4 | pv | tar -x -C $HOME/0g-storage-node/run
+    rm -rf $HOME/0g-storage-node/run/db
+    lz4 -c -d og_storage_2025-04-19_snap.tar.lz4 | pv | tar -x -C $HOME/0g-storage-node/run
     ```
   </TabItem>
   <TabItem label="Turbo Config">
         ```bash
-            **Note:** Turbo snapshot is currently under maintenance.
+        **Note:** Turbo snapshot is currently under maintenance.
         ```
   </TabItem>
 </Tabs>
