@@ -8,14 +8,16 @@
 .stake-button {
     display: flex;
     align-items: center;
-    background: var(--vp-c-bg-alt);
+    background: #39ff14; /* Neon green */
     padding: .75rem 1rem;
     border-radius: 8px;
     text-decoration: none;
-    border: 1px solid var(--vp-c-divider);
+    border: 1px solid #2aff1f;
     transition: all .3s ease;
-    color: var(--vp-c-text-1)
+    color: #000; /* Biar teks tetap terbaca */
+    box-shadow: 0 0 8px #39ff14, 0 0 20px #39ff14, 0 0 40px #39ff14;
 }
+
 
 .stake-button:hover {
     transform: scale(1.05);
