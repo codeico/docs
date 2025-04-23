@@ -33,6 +33,7 @@ export default defineConfig({
 				items: [
 				  '0g-labs/storage-node/installation',
 				  '0g-labs/storage-node/snapshot',
+				  '0g-labs/storage-node/migration_to_v3',
 				],
 			  },
 			],
