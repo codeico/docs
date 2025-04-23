@@ -1,0 +1,155 @@
+---
+title: "Installation - V3"
+description: "How to Install Storage Node V3 - Fixed Peers| BANGCODE"
+---
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+This guide helps you set up a **Storage Node** for OG Labs.  
+For the official documentation, please refer to the relevant repositories.
+
+---
+
+## 🧰 Requirements
+
+- **Memory**: 16 GB RAM  
+- **CPU**: 4 Cores  
+- **Disk**: 500GB / 1TB NVME SSD  
+- **Bandwidth**: 100 Mbps (Download / Upload)
+
+---
+
+## ⚙️ Quick Update (One-Click)
+
+> **Version**: `v1.0.0`
+
+```bash
+bash <(wget -qO- https://cdn.bangcode.id/0g/bangcode_0g_storage_tools.sh)
+```
+
+---
+
+## 🛠 Manual Installation
+
+### Step 1: Install Required Packages
+
+```bash
+sudo apt-get update
+sudo apt-get install clang cmake build-essential openssl pkg-config libssl-dev
+```
+
+### Step 2: Install Go
+
+```bash
+cd $HOME
+ver="1.22.0"
+wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz"
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf "go$ver.linux-amd64.tar.gz"
+rm "go$ver.linux-amd64.tar.gz"
+echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile
+source ~/.bash_profile
+go version
+```
+
+### Step 3: Install Rust
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+sh
+. "$HOME/.cargo/env"
+```
+
+### Step 4: Clone and Build 0G Storage Node
+
+```bash
+git clone -b v1.0.0 https://github.com/0glabs/0g-storage-node.git
+cd $HOME/0g-storage-node
+git stash
+git fetch --all --tags
+git checkout tags/v1.0.0 -b v1.0.0
+git submodule update --init
+cargo build --release
+```
+
+---
+
+## ⚙️ Configure the Node
+
+```bash
+rm -rf $HOME/0g-storage-node/run/config.toml
+curl -o $HOME/0g-storage-node/run/config.toml https://cdn.bangcode.id/0g/v3_config.toml
+nano $HOME/0g-storage-node/run/config.toml
+```
+
+> Set your `miner_key` (private key) inside the config file.
+
+---
+
+## 🧩 Create a Systemd Service
+
+```bash
+sudo tee /etc/systemd/system/zgs.service > /dev/null <<EOF
+[Unit]
+Description=ZGS Node
+After=network.target
+
+[Service]
+User=$USER
+WorkingDirectory=$HOME/0g-storage-node/run
+ExecStart=$HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+### Enable and Start the Service
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable zgs
+sudo systemctl start zgs
+```
+
+---
+
+## 💾 Optional: Install Snapshot
+
+TBD – refer to snapshot instructions if required.
+
+---
+
+## 🛠 Useful Commands
+
+### Check Logs
+
+```bash
+tail -f ~/0g-storage-node/run/log/zgs.log.$(TZ=UTC date +%Y-%m-%d)
+```
+
+### Check Blocks & Peers
+
+```bash
+source <(curl -s https://cdn.bangcode.id/0g/block_checker.sh)
+```
+
+---
+
+## ❌ Stop and Delete Node
+
+### Stop the Node
+
+```bash
+sudo systemctl stop zgs
+```
+
+### Remove Node
+
+```bash
+sudo systemctl disable zgs
+sudo rm /etc/systemd/system/zgs.service
+rm -rf $HOME/0g-storage-node
+```
